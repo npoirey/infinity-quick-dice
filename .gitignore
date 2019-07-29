@@ -1,0 +1,5 @@
+dist
+bakedresults/temp
+.idea
+target
+*.iml
