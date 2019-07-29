@@ -6,7 +6,7 @@ cache: npm
 
 script:
   - npm run build
-  - cd bakedresults/*.json dist/
+  - cp bakedresults/*.json dist/
 
 deploy:
   provider: pages
