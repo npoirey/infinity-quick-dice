@@ -5,6 +5,7 @@ node_js:
 cache: npm
 
 script:
+  - npm run test:unit
   - npm run build
   - cp bakedresults/*.json dist/
 
