@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.sacapuces</groupId>
-	<artifactId>infinitystats</artifactId>
+	<artifactId>infinity-quick-dices</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
