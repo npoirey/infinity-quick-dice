@@ -1,0 +1,17 @@
+@font-face {
+  font-family: 'Montalban';
+  src:  url('~@/assets/fonts/Montalban Bold.otf');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montalban';
+  src:  url('~@/assets/fonts/Montalban.otf') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  background: pink;
+}

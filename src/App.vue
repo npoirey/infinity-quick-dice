@@ -1,20 +1,30 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <HexButton @click="setVal" label="10"/>
+    <HexButton label="1"/>
+    <HexButton label="9"/>
+    <HexButton label="29"/>
+    {{val}}
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
+  import HexButton from '@/components/HexButton.vue';
+  import {Component, Vue} from 'vue-property-decorator';
+  import HelloWorld from './components/HelloWorld.vue';
 
-@Component({
+  @Component({
   components: {
     HelloWorld,
+    HexButton,
   },
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  val: number = 0;
+  setVal(){
+    this.val = this.val+1;
+  }
+}
 </script>
 
 <style lang="scss">

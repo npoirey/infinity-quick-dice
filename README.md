@@ -1,4 +1,4 @@
-# infinity-quick-dices
+# infinity-quick-dice
 
 ## Project setup
 ```
