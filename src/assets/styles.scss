@@ -12,6 +12,33 @@
   font-style: normal;
 }
 
+$background-color: #333;
+$text-color: white;
+
+$default-background-color: #715a45;
+$default-text-color: white;
+$default-border-color: #302017;
+
+$active-background-color: #F39619;
+$active-text-color: white;
+$active-border-color: #925016;
+
+$hover-background-color: #b16019;
+$hover-text-color: $active-text-color;
+$hover-border-color: #6e3715;
+
+$hex-button-height: 3em;
+$hex-button-coord-factor: 0.866025;
+$hex-button-width: $hex-button-coord-factor * $hex-button-height;
+// y coord of the top left point (top middle beeing 0)
+$hex-button-y1: 0.25 * $hex-button-height;
+// y coord of the bottom left point (bottom middle beeing $hex-button-height)
+$hex-button-y2: 0.5 * $hex-button-height;
+// x coord of the top middle point (top left beeing 0)
+$hex-button-x1: $hex-button-coord-factor * $hex-button-height * 2;
+
+
 body {
-  background: pink;
+  background: $background-color;
+  color: $text-color;
 }

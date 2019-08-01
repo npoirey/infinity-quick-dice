@@ -1,20 +1,17 @@
 <template>
-    <div>
-        <svg width="175" height="200">
-            <a @click="onClick" tabindex="0">
-                <polyline id="hexagon" points="87,0 174,50 174,150 87,200 0,150 0,50 87,0" />
-                <text x="90"
-                      y="90"
-                      fill="#FFFFFF"
-                      text-anchor="middle"
-                      font-size="90"
-                      dominant-baseline="central"
-                      alignment-baseline="central">
-                    {{label}}
-                </text>
-            </a>
-        </svg>
-    </div>
+    <svg viewBox="0 0 175 200">
+        <a @click="onClick" tabindex="0">
+            <polyline id="hexagon" points="87,2 173,50 173,150 87,198 2,150 2,50 87,2" />
+            <text x="90"
+                  y="95"
+                  text-anchor="middle"
+                  font-size="70"
+                  dominant-baseline="central"
+                  alignment-baseline="central">
+                {{label}}
+            </text>
+        </a>
+    </svg>
 </template>
 
 <script lang="ts">
@@ -23,9 +20,10 @@
   @Component
   export default class HexButton extends Vue {
     @Prop() private label!: string;
+    @Prop() private active!: boolean;
 
     @Emit('click')
-    onClick(){
+    onClick() {
 
     }
   }
@@ -33,9 +31,12 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-    div{
+
+    svg {
         display: inline-block;
+        max-height: $hex-button-height;
     }
+
     a {
         font-family: Montalban;
 
@@ -45,20 +46,35 @@
         -o-user-select: none;
         user-select: none;
 
+        polyline {
+            fill: $default-background-color;
+            stroke: $default-border-color;
+            stroke-width: 4px;
+            stroke-linecap: square;
+        }
+
+        text {
+            fill: $default-text-color;
+        }
+
 
         &:hover, &:focus {
             polyline {
-                fill: #42b983;
-                stroke: black;
-                stroke-width: -10px;
-            }
-        }
-        &:active {
-            polyline {
-                fill: #b0b921;
-                stroke: black;
-                stroke-width: -10px;
+                fill: $hover-background-color;
+                stroke: $hover-border-color;
             }
         }
     }
+
+    .active a, a:active {
+        polyline {
+            fill: $active-background-color;
+            stroke: $active-border-color;
+        }
+
+        text {
+            fill: $active-text-color
+        }
+    }
+
 </style>
