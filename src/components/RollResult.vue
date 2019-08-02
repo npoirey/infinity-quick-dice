@@ -1,18 +1,26 @@
 <template>
     <div class="roll-result">
         <h5>{{input.playerA.burst}} dice at {{input.playerA.attribute}} VS {{input.playerB.burst}} dice at {{input.playerB.attribute}}</h5>
-        <div class="bars">
-            <div class="player-a crit" :style="{width:percentData.playerACrit+'%'}">{{percentData.playerACrit}}</div>
-            <div class="player-a hit" :style="{width:percentData.playerAHit+'%'}">{{percentData.playerAHit}}</div>
-            <div class="nothing" :style="{width:percentData.nothing+'%'}">{{percentData.nothing}}</div>
-            <div class="player-b hit" :style="{width:percentData.playerBHit+'%'}">{{percentData.playerBHit}}</div>
-            <div class="player-b crit" :style="{width:percentData.playerBCrit+'%'}">{{percentData.playerBCrit}}</div>
-        </div>
-        <div class="details">
-            <span>{{percentData.playerACrit + percentData.playerAHit}}%</span><span>FtF</span><span>{{percentData.playerBCrit +
-            percentData.playerBHit}}%</span>
-            <span>{{percentData.playerACrit}}%</span><span>Crits</span><span>{{percentData.playerBCrit}}%</span>
-            <span>{{percentData.playerAHit}}%</span><span>Hits</span><span>{{percentData.playerBHit}}%</span>
+
+        <div class="ftf-grid"
+             :style="{'grid-template-columns': `${percentData.playerAHit}% ${percentData.playerAHit}% auto ${percentData.playerBHit}% ${percentData.playerBCrit}%`}">
+            <div class="ftf-grid-legend ftf-grid-legend-top">
+                <span class="player-a">Player A hit ({{percentData.playerACrit + percentData.playerAHit}}%)</span>
+                <span class="player-b">Player B hit ({{percentData.playerBCrit + percentData.playerBHit}}%)</span>
+            </div>
+            <div class="ftf-grid-legend-bar ftf-grid-legend-bar-top ftf-grid-legend-bar-player-a"></div>
+            <div class="ftf-grid-legend-bar ftf-grid-legend-bar-top ftf-grid-legend-bar-player-b"></div>
+            <div class="ftf-grid-bar ftf-grid-bar-player-a crit"></div>
+            <div class="ftf-grid-bar ftf-grid-bar-player-a hit"></div>
+            <div class="ftf-grid-bar ftf-grid-bar-nothing"></div>
+            <div class="ftf-grid-bar ftf-grid-bar-player-b hit"></div>
+            <div class="ftf-grid-bar ftf-grid-bar-player-b crit"></div>
+            <div class="ftf-grid-legend-bar ftf-grid-legend-bar-bottom ftf-grid-legend-bar-player-a"></div>
+            <div class="ftf-grid-legend-bar ftf-grid-legend-bar-bottom ftf-grid-legend-bar-player-b"></div>
+            <tr class="ftf-grid-legend ftf-grid-legend-bottom">
+                <span class="player-a">Player A Crit ({{percentData.playerACrit}}%)</span>
+                <span class="player-b">Player B Crit ({{percentData.playerBCrit}}%)</span>
+            </tr>
         </div>
     </div>
 </template>
@@ -103,42 +111,109 @@
 <style scoped lang="scss">
     .roll-result {
         margin: 0.5em;
+        padding: 0.5em;
         background: #925016;
-
-        .bars {
-            width: 100%;
-            height: 3em;
-            display: flex;
-
-            > div {
-                height: 100%;
-                overflow: hidden;
-            }
-
-            .player-a.crit {
-                background: blue;
-            }
-
-            .player-a.hit {
-                background: lightblue;
-            }
-
-            .nothing {
-                background: grey;
-            }
-
-            .player-b.hit {
-                background: orange;
-            }
-
-            .player-b.crit {
-                background: red;
-            }
+        h5{
+            margin: 0;
         }
-
-        .details {
+        .ftf-grid {
+            $legend-bar-size: 8px;
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: auto $legend-bar-size 1em $legend-bar-size auto;
+            // @formatter:off
+            grid-template-areas: "legend-top          legend-top          legend-top    legend-top       legend-top"
+                                 "legend-bar-top-a    legend-bar-top-a    .             legend-bar-top-b legend-bar-top-b"
+                                 "a-crits             a-hits              nothing       b-hits           b-crits"
+                                 "legend-bar-bottom-a .                   .             .                legend-bar-bottom-b"
+                                 "legend-bottom       legend-bottom       legend-bottom legend-bottom    legend-bottom";
+            // @formatter:on
+
+            .ftf-grid-legend {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.5em;
+
+                &.ftf-grid-legend-top {
+                    grid-area: legend-top;
+                }
+
+                &.ftf-grid-legend-bottom {
+                    grid-area: legend-bottom;
+                }
+            }
+
+            .ftf-grid-bar {
+                &.ftf-grid-bar-player-a {
+                    &.hit {
+                        grid-area: a-hits;
+                    }
+
+                    &.crit {
+                        grid-area: a-crits;
+                    }
+                }
+
+                &.ftf-grid-bar-player-b {
+                    &.hit {
+                        grid-area: b-hits;
+                    }
+
+                    &.crit {
+                        grid-area: b-crits;
+                    }
+                }
+
+                &.ftf-grid-bar-nothing {
+                    grid-area: nothing;
+                }
+            }
+
+            .ftf-grid-legend-bar {
+                border: 1px solid white;
+                margin: 2px 0;
+                &.ftf-grid-legend-bar-top {
+                    border-bottom: none;
+
+                    &.ftf-grid-legend-bar-player-a {
+                        grid-area: legend-bar-top-a;
+                    }
+
+                    &.ftf-grid-legend-bar-player-b {
+                        grid-area: legend-bar-top-b;
+                    }
+                }
+
+                &.ftf-grid-legend-bar-bottom {
+                    border-top: none;
+                    &.ftf-grid-legend-bar-player-a {
+                        grid-area: legend-bar-bottom-a;
+                    }
+
+                    &.ftf-grid-legend-bar-player-b {
+                        grid-area: legend-bar-bottom-b;
+                    }
+                }
+            }
+
+            .ftf-grid-bar-player-a {
+                background-color: dodgerblue;
+
+                &.crit {
+                    background-color: blue;
+                }
+            }
+
+            .ftf-grid-bar-player-b {
+                background-color: orange;
+
+                &.crit {
+                    background-color: orangered;
+                }
+            }
+
+            .ftf-grid-bar-nothing {
+                background-color: beige;
+            }
         }
     }
 </style>
