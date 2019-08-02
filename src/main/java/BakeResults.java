@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
     private static final long dicesFaces = 20;
 
     private static void compute1v1() throws IOException {
-        // 1 dice each, iterate on attribute value to be able to use this baseline to calculate for more dices
+        // 1 burst each, iterate on attribute value to be able to use this baseline to calculate for more dices
         for (long blueAttribute = 1; blueAttribute <= maxAttributeValue; blueAttribute++) {
             for (long redAttribute = 1; redAttribute <= maxAttributeValue; redAttribute++) {
                 Map<String, Map<String, Map<String, Long>>> bakedForCurrentBlueAndRedAttribute = new HashMap<>();
@@ -168,7 +168,7 @@ import java.util.concurrent.Executors;
                                     throw new RuntimeException("should not happen");
                                 }
                             } else {
-                                // new dice is blue
+                                // new burst is blue
                                 boolean isCrit = blueAttribute < 20 && newThrow == blueAttribute || blueAttribute >= 20 && newThrow >= 20;
                                 long newMaxBlue = Math.max(maxBlueSuccess, newThrow);
                                 if (isCrit) {
