@@ -1,7 +1,6 @@
 <template>
     <div id="app" style="height: 500px">
         <div class="headers">
-            <h1>Select both players data and click Roll !</h1>
         </div>
         <div class="main">
             <player-conf-panel :player-name="'A'" class="player-conf-panel-a" v-model="value.playerA"></player-conf-panel>
@@ -9,31 +8,31 @@
         </div>
         <div class="actions">
             <div>
-                <button @click="clear()">clear all results</button>
-                <button @click="reset()">reset selections</button>
-                <button @click="roll()">roll the dice !</button>
-            </div>
-            <div v-if="error">
-                {{error}}
+                <action-button @click="clear()" :label="'clear all results'"></action-button>
+                <action-button @click="reset()" :label="'reset selections'"></action-button>
+                <action-button @click="roll()" :label="'roll the dice !'"></action-button>
             </div>
         </div>
         <div class="results">
             <roll-result v-for="(result, i) in results" :input="result" :key="i"></roll-result>
         </div>
+        <vue-snotify></vue-snotify>
     </div>
 </template>
 
 
 <script lang="ts">
+  import ActionButton from '@/components/ActionButton.vue';
   import HexButton from '@/components/HexButton.vue';
   import PlayerConfPanel from '@/components/PlayerConfPanel.vue';
   import RollResult from '@/components/RollResult.vue';
   import SelectHexButton from '@/components/SelectHexButton.vue';
   import RollResultInput from '@/definitions/RollResultInput';
-  import {Component, Vue, Watch} from 'vue-property-decorator';
+  import {Component, Vue} from 'vue-property-decorator';
 
   @Component({
     components: {
+      ActionButton,
       RollResult,
       PlayerConfPanel,
       SelectHexButton,
@@ -42,29 +41,23 @@
   })
   export default class App extends Vue {
     results: RollResultInput[] = [];
-    error: string | null = null;
     value: RollResultInput = {
       playerA: {},
       playerB: {},
     };
 
-    @Watch('value', {deep: true})
-    onValueChange(){
-      this.error = null;
-    }
-
     checkForm(): boolean {
       let invalid: boolean = !this.value.playerA || !this.value.playerA.burst || !this.value.playerA.attribute || !this.value.playerB || !this.value.playerB.burst || !this.value.playerB.attribute;
       if (invalid) {
-        this.error = 'Please select burst and attribute for both players';
-      } else {
-        this.error = null;
+        this.$snotify.error('Please select burst and attribute for both players', 'Error', {
+          timeout: 3000,
+          showProgressBar: true,
+        })
       }
       return !invalid;
     }
 
     roll() {
-      this.error = null;
       if (this.checkForm()) {
         this.results.unshift({
           playerA: {
@@ -108,14 +101,34 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr;
+
+            .player-conf-panel-a {
+                background-color: $panel-a-background-color;
+            }
+            .player-conf-panel-b {
+                background-color: $panel-b-background-color;
+            }
         }
 
-        .actions {
+        .actions > div {
             grid-area: actions;
+            display: flex;
+            justify-content: space-between;
+            .action-button {
+                margin-right: 0.5em;
+                &:last-of-type {
+                    margin-right: 0;
+                }
+            }
         }
 
         .results {
             grid-area: results;
+        }
+
+        h2{
+            margin-top: 0.25em;
+            margin-bottom: .25em;
         }
 
     }

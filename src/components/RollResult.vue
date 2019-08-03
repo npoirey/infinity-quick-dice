@@ -3,10 +3,10 @@
         <h5>{{input.playerA.burst}} dice at {{input.playerA.attribute}} VS {{input.playerB.burst}} dice at {{input.playerB.attribute}}</h5>
 
         <div class="ftf-grid"
-             :style="{'grid-template-columns': `${percentData.playerAHit}% ${percentData.playerAHit}% auto ${percentData.playerBHit}% ${percentData.playerBCrit}%`}">
+             :style="{'grid-template-columns': `${percentData.playerACrit}% ${percentData.playerAHit}% auto ${percentData.playerBHit}% ${percentData.playerBCrit}%`}">
             <div class="ftf-grid-legend ftf-grid-legend-top">
-                <span class="player-a">Player A hit ({{percentData.playerACrit + percentData.playerAHit}}%)</span>
-                <span class="player-b">Player B hit ({{percentData.playerBCrit + percentData.playerBHit}}%)</span>
+                <span class="player-a">Player A hit ({{(percentData.playerACrit + percentData.playerAHit).toFixed(2)}}%)</span>
+                <span class="player-b">Player B hit ({{(percentData.playerBCrit + percentData.playerBHit).toFixed(2)}}%)</span>
             </div>
             <div class="ftf-grid-legend-bar ftf-grid-legend-bar-top ftf-grid-legend-bar-player-a"></div>
             <div class="ftf-grid-legend-bar ftf-grid-legend-bar-top ftf-grid-legend-bar-player-b"></div>
@@ -18,8 +18,8 @@
             <div class="ftf-grid-legend-bar ftf-grid-legend-bar-bottom ftf-grid-legend-bar-player-a"></div>
             <div class="ftf-grid-legend-bar ftf-grid-legend-bar-bottom ftf-grid-legend-bar-player-b"></div>
             <tr class="ftf-grid-legend ftf-grid-legend-bottom">
-                <span class="player-a">Player A Crit ({{percentData.playerACrit}}%)</span>
-                <span class="player-b">Player B Crit ({{percentData.playerBCrit}}%)</span>
+                <span class="player-a">Player A Crit ({{percentData.playerACrit.toFixed(2)}}%)</span>
+                <span class="player-b">Player B Crit ({{percentData.playerBCrit.toFixed(2)}}%)</span>
             </tr>
         </div>
     </div>
@@ -112,8 +112,9 @@
     .roll-result {
         margin: 0.5em;
         padding: 0.5em;
-        background: #925016;
+        background: $panel-neutral-background-color;
         h5{
+            font-family: Montalban;
             margin: 0;
         }
         .ftf-grid {
@@ -131,7 +132,7 @@
             .ftf-grid-legend {
                 display: flex;
                 justify-content: space-between;
-                font-size: 0.5em;
+                font-size: 0.75em;
 
                 &.ftf-grid-legend-top {
                     grid-area: legend-top;

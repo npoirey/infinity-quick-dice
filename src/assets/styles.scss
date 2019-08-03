@@ -1,3 +1,5 @@
+@import "~vue-snotify/styles/material";
+
 @font-face {
   font-family: 'Montalban';
   src:  url('~@/assets/fonts/Montalban Bold.otf');
@@ -27,6 +29,10 @@ $hover-background-color: #b16019;
 $hover-text-color: $active-text-color;
 $hover-border-color: #6e3715;
 
+$panel-a-background-color: #112b3c;
+$panel-b-background-color: #4c0007;
+$panel-neutral-background-color: #444444;
+
 $hex-button-height: 3em;
 $hex-button-coord-factor: 0.866025;
 $hex-button-width: $hex-button-coord-factor * $hex-button-height;
@@ -41,4 +47,8 @@ $hex-button-x1: $hex-button-coord-factor * $hex-button-height * 2;
 body {
   background: $background-color;
   color: $text-color;
+
+  a:focus, button:focus, svg:focus {
+    outline: none;
+  }
 }
