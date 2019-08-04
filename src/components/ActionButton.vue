@@ -38,8 +38,7 @@
     $offset: 600;
     svg {
         display: inline-block;
-        max-height: $hex-button-height;
-
+        height: $hex-button-height;
         fill: transparent;
         polyline {
             stroke-width: 5px;
