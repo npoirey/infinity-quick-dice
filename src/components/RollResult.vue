@@ -110,7 +110,7 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
     .roll-result {
-        margin: 0.5em;
+        margin: 0 0 0.5em;
         padding: 0.5em;
         background: $panel-neutral-background-color;
         h5{

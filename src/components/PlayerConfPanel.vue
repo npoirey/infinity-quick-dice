@@ -39,7 +39,6 @@
         display: flex;
         flex-flow: column;
         padding: 0.5em;
-        margin: 1em;
     }
     .grid {
         $hex-max-by-row: 6;

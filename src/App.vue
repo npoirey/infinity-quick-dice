@@ -1,6 +1,7 @@
 <template>
-    <div id="app" style="height: 500px">
+    <div id="app">
         <div class="headers">
+            <vue-snotify></vue-snotify>
         </div>
         <div class="main">
             <player-conf-panel :player-name="'A'" class="player-conf-panel-a" v-model="value.playerA"></player-conf-panel>
@@ -16,7 +17,6 @@
         <div class="results">
             <roll-result v-for="(result, i) in results" :input="result" :key="i"></roll-result>
         </div>
-        <vue-snotify></vue-snotify>
     </div>
 </template>
 
@@ -90,40 +90,62 @@
         -moz-osx-font-smoothing: grayscale;
         text-align: center;
         max-width: 800px;
+        height: 100%;
         margin: auto;
         display: grid;
         grid-template-columns: 100%;
-        grid-template-rows: 3em auto 3em auto;
+        grid-template-rows: auto auto auto auto;
         grid-template-areas: "header" "main" "actions" "results";
 
         .main {
             grid-area: main;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr;
+            @media only screen and (max-width: 600px) {
+                // smartphone
+                overflow-x: auto;
+                overflow-y: visible;
+                grid-template-columns: 100% 100%;
+                grid-template-rows: 1fr;
+                scroll-snap-coordinate: 0 0;
+                scroll-snap-points-x: repeat(100%);
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+            }
+            @media only screen and (min-width: 601px) {
+                // PC
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 1fr;
+            }
+
 
             .player-conf-panel-a {
                 background-color: $panel-a-background-color;
+                scroll-snap-align: start;
             }
             .player-conf-panel-b {
                 background-color: $panel-b-background-color;
+                scroll-snap-align: start;
             }
         }
 
-        .actions > div {
-            grid-area: actions;
-            display: flex;
-            justify-content: space-between;
-            .action-button {
-                margin-right: 0.5em;
-                &:last-of-type {
-                    margin-right: 0;
+        .actions {
+            margin: 0.5em 0;
+            > div {
+                grid-area: actions;
+                display: flex;
+                justify-content: space-between;
+                .action-button {
+                    margin-right: 0.5em;
+                    &:last-of-type {
+                        margin-right: 0;
+                    }
                 }
             }
         }
 
         .results {
             grid-area: results;
+            overflow: auto;
         }
 
         h2{
