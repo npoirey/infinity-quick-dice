@@ -3,9 +3,9 @@
         <div class="headers">
             <vue-snotify></vue-snotify>
         </div>
-        <div class="main">
-            <player-conf-panel :player-name="'A'" class="player-conf-panel-a" v-model="value.playerA"></player-conf-panel>
-            <player-conf-panel :player-name="'B'" class="player-conf-panel-b" v-model="value.playerB"></player-conf-panel>
+        <div class="main" id="main">
+            <player-conf-panel :player-name="'A'" id="player-conf-panel-a" class="player-conf-panel-a" v-model="value.playerA"></player-conf-panel>
+            <player-conf-panel :player-name="'B'" id="player-conf-panel-b" class="player-conf-panel-b" v-model="value.playerB"></player-conf-panel>
         </div>
         <div class="actions">
             <div>
@@ -78,6 +78,17 @@
         playerA: {},
         playerB: {},
       };
+      let firstPanel = document && document.getElementById('main');
+      setTimeout(() => {
+        if (firstPanel != null) {
+          return firstPanel.scroll({
+            behavior: 'smooth',
+            left: 0,
+            top: 0,
+          });
+        }
+      });
+
     }
 
     clear() {
@@ -159,7 +170,9 @@
                 margin: 0 0 0.5em;
                 overflow: hidden;
             }
-            .results-enter, .results-leave-to /* .list-leave-active below version 2.1.8 */ {
+
+            .results-enter, .results-leave-to /* .list-leave-active below version 2.1.8 */
+            {
                 opacity: 0;
 
                 padding: 0;
@@ -167,9 +180,11 @@
                 margin: 0;
                 transform: scale(0);
             }
+
             .results-move {
                 transition: transform 1s;
             }
+
             grid-area: results;
             overflow: auto;
         }
