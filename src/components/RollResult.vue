@@ -1,7 +1,6 @@
 <template>
     <div class="roll-result">
         <h5>{{input.playerA.burst}} dice at {{input.playerA.attribute}} VS {{input.playerB.burst}} dice at {{input.playerB.attribute}}</h5>
-
         <div class="ftf-grid"
              :style="{'grid-template-columns': `${percentData.playerACrit}% ${percentData.playerAHit}% auto ${percentData.playerBHit}% ${percentData.playerBCrit}%`}">
             <div class="ftf-grid-legend ftf-grid-legend-top">
@@ -110,7 +109,6 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
     .roll-result {
-        margin: 0 0 0.5em;
         padding: 0.5em;
         background: $panel-neutral-background-color;
         h5{

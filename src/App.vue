@@ -15,7 +15,9 @@
             </div>
         </div>
         <div class="results">
-            <roll-result v-for="(result, i) in results" :input="result" :key="i"></roll-result>
+            <transition-group name="results" tag="div">
+                <roll-result v-for="result in results" :input="result" :key="result.key"></roll-result>
+            </transition-group>
         </div>
     </div>
 </template>
@@ -52,7 +54,7 @@
         this.$snotify.error('Please select burst and attribute for both players', 'Error', {
           timeout: 3000,
           showProgressBar: true,
-        })
+        });
       }
       return !invalid;
     }
@@ -60,6 +62,7 @@
     roll() {
       if (this.checkForm()) {
         this.results.unshift({
+          key: new Date().toString(),
           playerA: {
             ...this.value.playerA,
           },
@@ -122,6 +125,7 @@
                 background-color: $panel-a-background-color;
                 scroll-snap-align: start;
             }
+
             .player-conf-panel-b {
                 background-color: $panel-b-background-color;
                 scroll-snap-align: start;
@@ -130,12 +134,15 @@
 
         .actions {
             margin: 0.5em 0;
+
             > div {
                 grid-area: actions;
                 display: flex;
                 justify-content: space-between;
+
                 .action-button {
                     margin-right: 0.5em;
+
                     &:last-of-type {
                         margin-right: 0;
                     }
@@ -144,11 +151,30 @@
         }
 
         .results {
+            .roll-result {
+                display: block;
+                transition: all 1s;
+                max-height: 6em;
+                transform: scale(1);
+                margin: 0 0 0.5em;
+                overflow: hidden;
+            }
+            .results-enter, .results-leave-to /* .list-leave-active below version 2.1.8 */ {
+                opacity: 0;
+
+                padding: 0;
+                max-height: 0;
+                margin: 0;
+                transform: scale(0);
+            }
+            .results-move {
+                transition: transform 1s;
+            }
             grid-area: results;
             overflow: auto;
         }
 
-        h2{
+        h2 {
             margin-top: 0.25em;
             margin-bottom: .25em;
         }
