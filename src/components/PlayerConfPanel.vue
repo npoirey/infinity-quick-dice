@@ -1,9 +1,9 @@
 <template>
     <div class="player-conf-panel">
         <h2>Player {{playerName}} Burst</h2>
-        <select-hex-button class="grid-6" :options="diceOptions" v-model="value.burst" @input="updateValue()"></select-hex-button>
+        <select-hex-button class="grid-6" :options="diceOptions" :value="value.burst" @input="updateBurst"></select-hex-button>
         <h2>Player {{playerName}} rolls on</h2>
-        <select-hex-button class="grid-30" :options="attributesOptions" v-model="value.attribute" ></select-hex-button>
+        <select-hex-button class="grid-30" :options="attributesOptions" :value="value.attribute" @input="updateAttribute"></select-hex-button>
     </div>
 </template>
 
@@ -25,10 +25,28 @@
     diceOptions = [...Array(6).keys()].map(value => ({value: value + 1}));
     attributesOptions = [...Array(30).keys()].map(value => ({value: value + 1}));
 
-    updateValue() {
+    updateBurst(value: number) {
+      let wasInvalid = !this.value.attribute || !this.value.burst;
+      let isInvalid = !this.value.attribute || !value;
       this.$emit('input', {
-        ...this.value
-      })
+        ...this.value,
+        burst: value,
+      });
+      if(wasInvalid && !isInvalid){
+        this.$emit('becomeValid');
+      }
+    }
+
+    updateAttribute(value: number) {
+      let wasInvalid = !this.value.attribute || !this.value.burst;
+      let isInvalid = !this.value.burst || !value;
+      this.$emit('input', {
+        ...this.value,
+        attribute: value,
+      });
+      if(wasInvalid && !isInvalid){
+        this.$emit('becomeValid');
+      }
     }
   }
 </script>
@@ -70,6 +88,7 @@
     .grid-6 {
         @include hex-grid(6, 6);
     }
+
     .grid-30 {
         @include hex-grid(6, 30);
     }

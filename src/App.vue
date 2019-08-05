@@ -4,8 +4,8 @@
             <vue-snotify></vue-snotify>
         </div>
         <div class="main" id="main">
-            <player-conf-panel :player-name="'A'" id="player-conf-panel-a" class="player-conf-panel-a" v-model="value.playerA"></player-conf-panel>
-            <player-conf-panel :player-name="'B'" id="player-conf-panel-b" class="player-conf-panel-b" v-model="value.playerB"></player-conf-panel>
+            <player-conf-panel :player-name="'A'" id="player-conf-panel-a" class="player-conf-panel-a" v-model="playerA" @becomeValid="scrollMainPanel(1)"></player-conf-panel>
+            <player-conf-panel :player-name="'B'" id="player-conf-panel-b" class="player-conf-panel-b" v-model="playerB"></player-conf-panel>
         </div>
         <div class="actions">
             <div>
@@ -29,6 +29,7 @@
   import PlayerConfPanel from '@/components/PlayerConfPanel.vue';
   import RollResult from '@/components/RollResult.vue';
   import SelectHexButton from '@/components/SelectHexButton.vue';
+  import PlayerInput from '@/definitions/PlayerInput';
   import RollResultInput from '@/definitions/RollResultInput';
   import {Component, Vue} from 'vue-property-decorator';
 
@@ -43,13 +44,11 @@
   })
   export default class App extends Vue {
     results: RollResultInput[] = [];
-    value: RollResultInput = {
-      playerA: {},
-      playerB: {},
-    };
+    playerA: PlayerInput = {};
+    playerB: PlayerInput = {};
 
     checkForm(): boolean {
-      let invalid: boolean = !this.value.playerA || !this.value.playerA.burst || !this.value.playerA.attribute || !this.value.playerB || !this.value.playerB.burst || !this.value.playerB.attribute;
+      let invalid: boolean = !this.playerA || !this.playerA.burst || !this.playerA.attribute || !this.playerB || !this.playerB.burst || !this.playerB.attribute;
       if (invalid) {
         this.$snotify.error('Please select burst and attribute for both players', 'Error', {
           timeout: 3000,
@@ -64,31 +63,30 @@
         this.results.unshift({
           key: new Date().toString(),
           playerA: {
-            ...this.value.playerA,
+            ...this.playerA,
           },
           playerB: {
-            ...this.value.playerB,
+            ...this.playerB,
           },
         });
       }
     }
 
     reset() {
-      this.value = {
-        playerA: {},
-        playerB: {},
-      };
-      let firstPanel = document && document.getElementById('main');
-      setTimeout(() => {
-        if (firstPanel != null) {
-          return firstPanel.scroll({
-            behavior: 'smooth',
-            left: 0,
-            top: 0,
-          });
-        }
-      });
+      this.playerA= {};
+      this.playerB= {};
+      this.scrollMainPanel(0);
+    }
 
+    scrollMainPanel(index: number){
+      let firstPanel = document && document.getElementById('main');
+      if (firstPanel != null) {
+        firstPanel.scroll({
+          behavior: 'smooth',
+          left: index * firstPanel.offsetWidth,
+          top: 0,
+        });
+      }
     }
 
     clear() {
