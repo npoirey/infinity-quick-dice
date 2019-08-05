@@ -35,6 +35,7 @@
     svg {
         display: inline-block;
         max-height: $hex-button-height;
+    clip-path: polygon(0 25%,0 75%, 50% 100%, 100% 75%,100% 25%, 50% 0)
     }
 
     a {
