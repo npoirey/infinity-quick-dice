@@ -1,7 +1,6 @@
 <template>
     <div id="app">
         <div class="headers">
-            <vue-snotify></vue-snotify>
         </div>
         <div class="main" id="main">
             <player-conf-panel :player-name="'A'" id="player-conf-panel-a" class="player-conf-panel-a" v-model="playerA" @becomeValid="scrollMainPanel(1)"></player-conf-panel>
@@ -49,11 +48,7 @@
 
     checkForm(): boolean {
       let invalid: boolean = !this.playerA || !this.playerA.burst || !this.playerA.attribute || !this.playerB || !this.playerB.burst || !this.playerB.attribute;
-      if (invalid) {
-        this.$snotify.error('Please select burst and attribute for both players', 'Error', {
-          timeout: 3000,
-          showProgressBar: true,
-        });
+      if (invalid) {//todo
       }
       return !invalid;
     }
