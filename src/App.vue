@@ -3,15 +3,14 @@
         <div class="headers">
         </div>
         <div class="main" id="main">
-            <player-conf-panel :player-name="'A'" id="player-conf-panel-a" class="player-conf-panel-a" v-model="playerA" @becomeValid="scrollMainPanel(1)"></player-conf-panel>
+            <player-conf-panel :player-name="'A'" id="player-conf-panel-a" class="player-conf-panel-a" v-model="playerA"
+                               @becomeValid="scrollMainPanel(1)"></player-conf-panel>
             <player-conf-panel :player-name="'B'" id="player-conf-panel-b" class="player-conf-panel-b" v-model="playerB"></player-conf-panel>
         </div>
         <div class="actions">
-            <div>
-                <action-button @click="clear()" :label="'clear all results'"></action-button>
-                <action-button @click="reset()" :label="'reset selections'"></action-button>
-                <action-button @click="roll()" :label="'roll the dice !'"></action-button>
-            </div>
+            <action-button @click="clear()" :label="'clear all results'"></action-button>
+            <action-button @click="reset()" :label="'reset selections'"></action-button>
+            <action-button @click="roll()" :label="'roll the dice !'"></action-button>
         </div>
         <div class="results">
             <transition-group name="results" tag="div">
@@ -48,7 +47,10 @@
 
     checkForm(): boolean {
       let invalid: boolean = !this.playerA || !this.playerA.burst || !this.playerA.attribute || !this.playerB || !this.playerB.burst || !this.playerB.attribute;
-      if (invalid) {//todo
+      if (invalid) {
+        Vue.toasted.show("at least burst and roll are needed for both players", {
+          type:'error'
+        })
       }
       return !invalid;
     }
@@ -56,7 +58,7 @@
     roll() {
       if (this.checkForm()) {
         this.results.unshift({
-          key: new Date().toString(),
+          key: this.results.length,
           playerA: {
             ...this.playerA,
           },
@@ -68,12 +70,12 @@
     }
 
     reset() {
-      this.playerA= {};
-      this.playerB= {};
+      this.playerA = {};
+      this.playerB = {};
       this.scrollMainPanel(0);
     }
 
-    scrollMainPanel(index: number){
+    scrollMainPanel(index: number) {
       let firstPanel = document && document.getElementById('main');
       if (firstPanel != null) {
         firstPanel.scroll({
@@ -138,18 +140,17 @@
 
         .actions {
             margin: 0.5em 0;
+            grid-area: actions;
+            display: flex;
+            justify-content: space-between;
 
-            > div {
-                grid-area: actions;
-                display: flex;
-                justify-content: space-between;
+            .action-button {
+                flex-basis: 0;
+                flex-grow: 1;
+                margin-right: 0.5em;
 
-                .action-button {
-                    margin-right: 0.5em;
-
-                    &:last-of-type {
-                        margin-right: 0;
-                    }
+                &:last-of-type {
+                    margin-right: 0;
                 }
             }
         }
@@ -157,7 +158,7 @@
         .results {
             .roll-result {
                 display: block;
-                transition: all 1s;
+                transition: all 0.5s;
                 max-height: 6em;
                 transform: scale(1);
                 margin: 0 0 0.5em;
@@ -175,7 +176,7 @@
             }
 
             .results-move {
-                transition: transform 1s;
+                transition: transform 0.5s;
             }
 
             grid-area: results;

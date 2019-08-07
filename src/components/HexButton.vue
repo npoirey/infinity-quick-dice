@@ -58,6 +58,9 @@
             fill: $default-text-color;
         }
 
+        &:hover {
+            cursor: pointer;
+        }
 
         &:hover, &:focus {
             polyline {

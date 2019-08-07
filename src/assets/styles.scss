@@ -46,7 +46,5 @@ body {
   background: $background-color;
   color: $text-color;
 
-  a:focus, button:focus, svg:focus {
-    outline: none;
-  }
+
 }

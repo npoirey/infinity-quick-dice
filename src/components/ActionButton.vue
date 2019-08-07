@@ -1,87 +1,51 @@
 <template>
-    <svg viewBox="0 0 250 50" class="action-button">
-        <a @click="onClick" tabindex="0" :class="{animation: animation}">
-            <polyline class="o1" points="0 0, 250 0, 250 50, 0 50, 0 0"></polyline>
-            <polyline class="o2" points="0 0, 250 0, 250 50, 0 50, 0 0"></polyline>
-            <text x="125"
-                  y="25"
-                  text-anchor="middle"
-                  font-size="15"
-                  dominant-baseline="central"
-                  alignment-baseline="central">
-                {{label}}
-            </text>
-        </a>
-    </svg>
+    <button class="action-button" :disabled="disabled" @click.prevent="onClick">{{label}}</button>
 </template>
 
 <script lang="ts">
   import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
 
   @Component
-  export default class HexButton extends Vue {
+  export default class ActionButton extends Vue {
     @Prop() private label!: string;
     @Prop() private active!: boolean;
+    @Prop() private disabled!: boolean;
     animation = false;
 
     @Emit('click')
     onClick() {
-        this.animation = true;
-        setTimeout(() => this.animation = false, 500);
+      this.animation = true;
+      setTimeout(() => this.animation = false, 500);
     }
   }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-    $duration: 0.5s;
-    $offset: 600;
-    svg {
-        display: inline-block;
-        height: $hex-button-height;
-        fill: transparent;
-        polyline {
-            stroke-width: 5px;
-            vector-effect:non-scaling-stroke;
-        }
-    }
-
-    a {
+    button {
+        border: 1px solid $default-border-color;
+        color: $default-text-color;
+        background: $default-background-color;
         font-family: Montalban;
+        padding: 0.5em;
+        text-transform: uppercase;
 
-        -webkit-user-select: none;
-        -khtml-user-select: none;
-        -moz-user-select: none;
-        -o-user-select: none;
-        user-select: none;
-
-        .o1 {
-            stroke: $active-background-color;
-            transition: all $duration ease-in-out;
+        &:hover {
+            background-color: $hover-background-color;
+            border-color: $hover-border-color;
+            color: $hover-text-color;
+            cursor: pointer;
         }
-
-        .o2 {
-            stroke: white;
-            stroke-dasharray: 20 $offset;
-            stroke-dashoffset: 20;
-            transition: all $duration ease-in-out;
+        &:active {
+            background-color: $active-background-color;
+            border-color: $active-border-color;
+            color: $active-text-color;
         }
-
-        text {
-            fill: $default-text-color;
-            text-transform: uppercase;
-            margin: 1em;
+        &:focus{
+            outline: none;
         }
-
-
-        &.animation {
-            .o1{
-                fill: $active-background-color;
-                fill-opacity: .3;
-            }
-            .o2 {
-                stroke-dashoffset: -$offset;
-            }
+        &::-moz-focus-inner {
+            border: 0;
         }
     }
 </style>
