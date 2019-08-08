@@ -30,6 +30,7 @@
   import PlayerInput from '@/definitions/PlayerInput';
   import RollResultInput from '@/definitions/RollResultInput';
   import {Component, Vue} from 'vue-property-decorator';
+  import {loadRolls} from './services/RollService';
 
   @Component({
     components: {
@@ -44,6 +45,11 @@
     results: RollResultInput[] = [];
     playerA: PlayerInput = {};
     playerB: PlayerInput = {};
+
+    constructor() {
+      super();
+      loadRolls();
+    }
 
     checkForm(): boolean {
       let invalid: boolean = !this.playerA || !this.playerA.burst || !this.playerA.attribute || !this.playerB || !this.playerB.burst || !this.playerB.attribute;

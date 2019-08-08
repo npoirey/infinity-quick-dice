@@ -26,26 +26,32 @@
 
 <script lang="ts">
   import RollResultInput from '@/definitions/RollResultInput';
+  import {getRollResult} from '@/services/RollService';
   import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 
   @Component
   export default class HexButton extends Vue {
     @Prop({default: null}) private input!: RollResultInput;
     data: any = null;
-    percentData: any = null;
+    percentData: any =  {
+      playerACrit: 0,
+      playerAHit: 0,
+      nothing: 0,
+      playerBCrit: 0,
+      playerBHit: 0,
+    };
     total: number = 0;
 
     @Watch('input', {immediate: true, deep: true})
-    onInputChange(newVal: RollResultInput) {
+    async onInputChange(newVal: RollResultInput) {
       if (newVal && newVal.playerA && newVal.playerB && newVal.playerA.burst && newVal.playerB.burst) {
         const invert = newVal.playerA.burst > newVal.playerB.burst;
-        const filename = invert ? newVal.playerB.burst + 'v' + newVal.playerA.burst + 'Final.json' : newVal.playerA.burst + 'v' + newVal.playerB.burst + 'Final.json';
-        const json = require('@/assets/rolls/' + filename);
         const key = invert ?
                     newVal.playerB.burst + 'dicesat' + newVal.playerB.attribute + 'vs' + newVal.playerA.burst + 'dicesat' + newVal.playerA.attribute :
                     newVal.playerA.burst + 'dicesat' + newVal.playerA.attribute + 'vs' + newVal.playerB.burst + 'dicesat' + newVal.playerB.attribute;
         console.log('loading data from' + key + ', invert=' + invert);
-        this.loadData(json[key], invert);
+        const results = await getRollResult(key);
+        this.loadData(results, invert);
       }
     }
 
