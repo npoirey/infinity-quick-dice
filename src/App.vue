@@ -215,6 +215,13 @@
             }
         }
 
+        @media only screen and (max-width: 600px) {
+            .actions, .results {
+                padding-left: 0.5em;
+                padding-right: 0.5em;
+            }
+        }
+
         .actions {
             margin: 0.5em 0;
             grid-area: actions;
