@@ -1,6 +1,18 @@
 <template>
     <div id="app">
         <div class="headers">
+            <transition>
+                <div class="loader" v-if="loadingState.state !== 'done'">
+                    <div class="loading-bar" :style="{width: (loadingState.download ? loadingState.download : 0) + '%'}"></div>
+                    <div class="loading-title">
+                        <div class="loading-title-main">Loading data...</div>
+                        <div class="loading-title-sub">
+                            <span v-if="loadingState.state === 'downloading'">downloading ({{loadingState.download.toFixed(2)}}%)</span>
+                            <span v-else>extracting data</span>
+                        </div>
+                    </div>
+                </div>
+            </transition>
         </div>
         <div class="main" id="main">
             <player-conf-panel :player-name="'A'" id="player-conf-panel-a" class="player-conf-panel-a" v-model="playerA"
@@ -30,7 +42,7 @@
   import PlayerInput from '@/definitions/PlayerInput';
   import RollResultInput from '@/definitions/RollResultInput';
   import {Component, Vue} from 'vue-property-decorator';
-  import {loadRolls} from './services/RollService';
+  import {LoadingState, loadingStateObservable, loadRolls} from './services/RollService';
 
   @Component({
     components: {
@@ -45,20 +57,35 @@
     results: RollResultInput[] = [];
     playerA: PlayerInput = {};
     playerB: PlayerInput = {};
+    loadingState: LoadingState = {
+      state: 'done',
+      download: 0,
+    };
 
     constructor() {
       super();
       loadRolls();
+      loadingStateObservable.subscribe(this.setLoading);
+    }
+
+    setLoading(value: LoadingState) {
+      this.loadingState = value;
     }
 
     checkForm(): boolean {
-      let invalid: boolean = !this.playerA || !this.playerA.burst || !this.playerA.attribute || !this.playerB || !this.playerB.burst || !this.playerB.attribute;
-      if (invalid) {
-        Vue.toasted.show("at least burst and roll are needed for both players", {
-          type:'error'
-        })
+      let canProceed = true;
+      if (this.loadingState.state !== 'done') {
+        Vue.toasted.show('Please wait the end of data loading', {
+          type: 'error',
+        });
+        canProceed = false;
+      } else if (!this.playerA || !this.playerA.burst || !this.playerA.attribute || !this.playerB || !this.playerB.burst || !this.playerB.attribute) {
+        Vue.toasted.show('at least burst and roll are needed for both players', {
+          type: 'error',
+        });
+        canProceed = false;
       }
-      return !invalid;
+      return canProceed;
     }
 
     roll() {
@@ -111,6 +138,50 @@
         grid-template-columns: 100%;
         grid-template-rows: auto auto auto auto;
         grid-template-areas: "header" "main" "actions" "results";
+
+        .headers {
+
+            .loader {
+                $loader-height: 3em;
+                height: $loader-height;
+                transition: height 0.5s ease-in-out;
+                background: $hover-background-color;
+
+                .loading-bar {
+                    background: $active-background-color;
+                    height: 100%;
+                    transition: width 0.5s ease-out;
+                }
+
+                .loading-title {
+                    font-family: Montalban;
+                    opacity: 1;
+                    height: $loader-height;
+                    overflow: hidden;
+                    transition: all 0.5s ease-in-out;
+                    text-shadow: black 1px 0 0 0;
+                    position: absolute;
+                    top: 0.25em;
+                    width: 100%;
+                    display: inline-block;
+                    transform: translateX(-50%);
+                    .loading-title-sub{
+                        font-size: x-small;
+                    }
+                }
+
+                &.v-enter, &.v-leave-to {
+                    height: 0;
+
+                    .loading-title {
+                        opacity: 0;
+                        height: 0;
+                    }
+                }
+
+            }
+
+        }
 
         .main {
             grid-area: main;
@@ -171,10 +242,8 @@
                 overflow: hidden;
             }
 
-            .results-enter, .results-leave-to /* .list-leave-active below version 2.1.8 */
-            {
+            .results-enter, .results-leave-to {
                 opacity: 0;
-
                 padding: 0;
                 max-height: 0;
                 margin: 0;

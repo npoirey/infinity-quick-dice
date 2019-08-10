@@ -45,6 +45,6 @@ $hex-button-x1: $hex-button-coord-factor * $hex-button-height * 2;
 body {
   background: $background-color;
   color: $text-color;
-
-
+  margin:0;
+  font-family: Montalban;
 }

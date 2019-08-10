@@ -3,6 +3,28 @@ import {openDB} from 'idb';
 const dbName = 'IQB';
 const dbVersion = 3;
 const storeName = 'iqd-rolls';
+const expectedRollsNumber = 18900;
+
+export interface LoadingState {
+  state: 'downloading' | 'extracting' | 'done',
+  download?: number,
+}
+
+class Observable<T> {
+  private callback: Function | null = null;
+
+  subscribe(callback: Function | null) {
+    this.callback = callback;
+  }
+
+  emit(value: T) {
+    if (this.callback) {
+      this.callback(value);
+    }
+  }
+}
+
+export const loadingStateObservable: Observable<LoadingState> = new Observable<LoadingState>();
 
 export async function loadRolls() {
   if (!('indexedDB' in window)) {
@@ -10,7 +32,6 @@ export async function loadRolls() {
     return;
   }
 
-  let loadData = false;
   const db = await openDB(dbName, dbVersion, {
     async upgrade(db, oldVersion, newVersion, transaction) {
       if (!db.objectStoreNames.contains(storeName)) {
@@ -18,19 +39,25 @@ export async function loadRolls() {
       }
     },
   });
-  console.log(db.objectStoreNames);
 
   let count = await db.count(storeName);
-  console.log("currently " + count + " entries in indexedDb");
-  loadData = count != 18900; //number of rolls we should have
-
-  if(loadData) {
+  console.log('currently ' + count + ' entries in indexedDb');
+  let loadData = count != expectedRollsNumber; //number of rolls we should have
+  if (loadData) {
     console.log('loading rolls');
+    loadingStateObservable.emit({
+      state: 'downloading',
+      download: 0,
+    });
     let request = new XMLHttpRequest();
     request.responseType = 'json';
 
     request.addEventListener('progress', function (e) {
       let percent_complete = (e.loaded / e.total) * 100;
+      loadingStateObservable.emit({
+        state: 'downloading',
+        download: percent_complete,
+      });
       console.log(percent_complete);
     });
 
@@ -41,35 +68,57 @@ export async function loadRolls() {
         console.log('Download is under progress');
       } else if (request.readyState == 4) {
         console.log('Downloading has finished');
-      console.time('inserting');
+        console.time('inserting');
         // request.response holds the file data
-        let tx = db.transaction(storeName, 'readwrite');
-        let store = tx.store;
-        store.clear();
-        for (let key of Object.keys(request.response)) {
-          store.put({
-            ...request.response[key],
-          }, key);
-        }
-        await tx.done;
-        console.log("data inserted in indexedDB")
-        console.timeEnd('inserting')
+        loadingStateObservable.emit({
+          state: 'extracting',
+          download: 100,
+        });
+
+        let worker = new Worker('/PersistRollsWorker.js');
+        worker.onmessage = (message) => {
+          console.log('got response from worker', message);
+          switch (message.data) {
+            case 'ready':
+              // posting to persist data in db now that the worker is ready
+              worker.postMessage({
+                action: 'load',
+                storeName,
+                rolls: request.response,
+              });
+              break;
+            case 'loaded':
+              console.timeEnd('inserting');
+              loadingStateObservable.emit({
+                state: 'done',
+              });
+              break;
+          }
+        };
+        worker.postMessage({
+          action: 'init',
+          dbName,
+          dbVersion,
+        });
       }
     });
 
     request.open('get', 'rolls/rolls.json');
     request.send();
   } else {
-    console.log("data loading not needed")
+    loadingStateObservable.emit({
+      state: 'done',
+    });
+    console.log('data loading not needed');
   }
   return;
-};
+}
 
-export async function getRollResult(key: string): Promise<{[key: string]: number}> {
-  //const results = await db.get(storeName, key);
+/**
+ * get the roll results for the key (from indexeddb)
+ * @param key
+ */
+export async function getRollResult(key: string): Promise<{ [key: string]: number }> {
   const db = await openDB(dbName, dbVersion);
   return db.get(storeName, key);
 }
-
-// Get a value from a store:
-//const value = await db.get(storeName, key);
