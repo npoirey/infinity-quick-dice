@@ -4,6 +4,7 @@ const dbName = 'IQB';
 const dbVersion = 3;
 const storeName = 'iqd-rolls';
 const expectedRollsNumber = 18900;
+const estimatedUnzippedSize = 13701847; // size of rools.json unzipped
 
 export interface LoadingState {
   state: 'downloading' | 'extracting' | 'done',
@@ -53,7 +54,14 @@ export async function loadRolls() {
     request.responseType = 'json';
 
     request.addEventListener('progress', function (e) {
-      let percent_complete = (e.loaded / e.total) * 100;
+      let percent_complete;
+      if(e.lengthComputable){
+        percent_complete = (e.loaded / e.total) * 100;
+      } else {
+        //gzip, estimate progress
+        percent_complete = (e.loaded / estimatedUnzippedSize) * 100;
+      }
+
       loadingStateObservable.emit({
         state: 'downloading',
         download: percent_complete,
