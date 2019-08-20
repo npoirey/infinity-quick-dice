@@ -86,7 +86,7 @@ export async function loadRolls() {
         let worker = new Worker('/PersistRollsWorker.js');
         worker.onmessage = (message) => {
           console.log('got response from worker', message);
-          switch (message.data) {
+          switch (message.data.state) {
             case 'ready':
               // posting to persist data in db now that the worker is ready
               worker.postMessage({
@@ -100,6 +100,8 @@ export async function loadRolls() {
               loadingStateObservable.emit({
                 state: 'done',
               });
+              break;
+            case 'error':
               break;
           }
         };
