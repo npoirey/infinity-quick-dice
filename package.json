@@ -1,7 +1,7 @@
 {
   "name": "infinity-quick-dice",
   "version": "0.1.0",
-  "license": "Unlicense",
+  "license": "unlicense",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
