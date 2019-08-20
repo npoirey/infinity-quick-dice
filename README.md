@@ -1,5 +1,6 @@
 # infinity-quick-dice
 
+Supported by [![Browserstack](extra/Browserstack-logo-100.png)](https://www.browserstack.com)
 ## Project setup
 ```
 npm install
