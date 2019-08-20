@@ -28,6 +28,7 @@
             <transition-group name="results" tag="div">
                 <roll-result v-for="result in results" :input="result" :key="result.key"></roll-result>
             </transition-group>
+            <div v-for="error in errors">{{error}}</div>
         </div>
     </div>
 </template>
@@ -42,7 +43,7 @@
   import PlayerInput from '@/definitions/PlayerInput';
   import RollResultInput from '@/definitions/RollResultInput';
   import {Component, Vue} from 'vue-property-decorator';
-  import {LoadingState, loadingStateObservable, loadRolls} from './services/RollService';
+  import {errorObservable, LoadingState, loadingStateObservable, loadRolls} from './services/RollService';
 
   @Component({
     components: {
@@ -61,11 +62,18 @@
       state: 'done',
       download: 0,
     };
+    errors: String[] = [];
 
     constructor() {
       super();
-      loadRolls();
+
       loadingStateObservable.subscribe(this.setLoading);
+      errorObservable.subscribe(this.addError);
+      loadRolls().catch((e) => this.errors.push(e.message));
+    }
+
+    addError(error: String) {
+      this.errors.push(error);
     }
 
     setLoading(value: LoadingState) {
@@ -165,7 +173,8 @@
                     width: 100%;
                     display: inline-block;
                     transform: translateX(-50%);
-                    .loading-title-sub{
+
+                    .loading-title-sub {
                         font-size: x-small;
                     }
                 }

@@ -26,11 +26,11 @@ class Observable<T> {
 }
 
 export const loadingStateObservable: Observable<LoadingState> = new Observable<LoadingState>();
+export const errorObservable: Observable<String> = new Observable<String>();
 
 export async function loadRolls() {
   if (!('indexedDB' in window)) {
-    console.log('This browser doesn\'t support IndexedDB');
-    return;
+    throw new Error('This browser doesn\'t support IndexedDB');
   }
 
   const db = await openDB(dbName, dbVersion, {
@@ -43,7 +43,8 @@ export async function loadRolls() {
 
   let count = await db.count(storeName);
   console.log('currently ' + count + ' entries in indexedDb');
-  let loadData = count != expectedRollsNumber; //number of rolls we should have
+  // fixme remove ||true
+  let loadData = count != expectedRollsNumber || true; //number of rolls we should have
   if (loadData) {
     console.log('loading rolls');
     loadingStateObservable.emit({
@@ -53,9 +54,13 @@ export async function loadRolls() {
     let request = new XMLHttpRequest();
     request.responseType = 'json';
 
+    request.onerror = function (e) {
+      errorObservable.emit('Request to load data failed');
+    };
+
     request.addEventListener('progress', function (e) {
       let percent_complete;
-      if(e.lengthComputable){
+      if (e.lengthComputable) {
         percent_complete = (e.loaded / e.total) * 100;
       } else {
         //gzip, estimate progress
@@ -66,6 +71,7 @@ export async function loadRolls() {
         state: 'downloading',
         download: percent_complete,
       });
+
       console.log(percent_complete);
     });
 
@@ -75,17 +81,20 @@ export async function loadRolls() {
       } else if (request.readyState == 3) {
         console.log('Download is under progress');
       } else if (request.readyState == 4) {
+        if (request.status != 200) {
+          return;
+        }
         console.log('Downloading has finished');
         console.time('inserting');
-        // request.response holds the file data
         loadingStateObservable.emit({
           state: 'extracting',
           download: 100,
         });
 
         let worker = new Worker('/PersistRollsWorker.js');
+        worker.onerror = (error) => errorObservable.emit(error.message);
         worker.onmessage = (message) => {
-          console.log('got response from worker', message);
+          console.log('got response from worker', message && message.data);
           switch (message.data.state) {
             case 'ready':
               // posting to persist data in db now that the worker is ready
@@ -102,6 +111,7 @@ export async function loadRolls() {
               });
               break;
             case 'error':
+              errorObservable.emit(message.data.details);
               break;
           }
         };
