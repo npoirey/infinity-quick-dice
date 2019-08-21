@@ -68,7 +68,7 @@
 
     constructor() {
       super();
-      this.version = JSON.parse(unescape(process.env.PACKAGE_JSON || '%7Bversion%3A0%7D')).version
+      this.version = JSON.parse(unescape(process.env.PACKAGE_JSON || '%7Bversion%3A0%7D')).version;
       loadingStateObservable.subscribe(this.setLoading);
       errorObservable.subscribe(this.addError);
       loadRolls().catch((e) => this.errors.push(e.message));

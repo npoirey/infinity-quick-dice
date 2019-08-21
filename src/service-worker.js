@@ -7,7 +7,8 @@
 workbox.core.setCacheNameDetails({prefix: 'iqd'});
 
 // todo handle this automatically with travis, from package.json
-const LATEST_VERSION = '0.1.0'; // Change this value every time you want to deploy
+console.log('toto' + JSON.parse(unescape(process.env.PACKAGE_JSON || '%7Bversion%3A0%7D')).version);
+const LATEST_VERSION = '0.1.00'; // Change this value every time you want to deploy
 
 self.addEventListener('activate', (event) => {
   console.log(`%c ${LATEST_VERSION} `, 'background: #ddd; color: #0000ff');
