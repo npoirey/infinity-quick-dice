@@ -29,6 +29,7 @@
                 <roll-result v-for="result in results" :input="result" :key="result.key"></roll-result>
             </transition-group>
             <div v-for="error in errors">{{error}}</div>
+            <div class="version">version {{version}}</div>
         </div>
     </div>
 </template>
@@ -63,10 +64,11 @@
       download: 0,
     };
     errors: String[] = [];
+    version: string;
 
     constructor() {
       super();
-
+      this.version = JSON.parse(unescape(process.env.PACKAGE_JSON || '%7Bversion%3A0%7D')).version
       loadingStateObservable.subscribe(this.setLoading);
       errorObservable.subscribe(this.addError);
       loadRolls().catch((e) => this.errors.push(e.message));
@@ -272,6 +274,11 @@
 
             grid-area: results;
             overflow: auto;
+
+            .version {
+                font-size: 0.75rem;
+                opacity: 0.5;
+            }
         }
 
         h2 {

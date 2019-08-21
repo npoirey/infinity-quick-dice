@@ -1,3 +1,5 @@
+const webpack = require('webpack')
+
 module.exports = {
   lintOnSave: false,
   css: {
@@ -15,5 +17,13 @@ module.exports = {
       swSrc: 'src/service-worker.js',
     },
   },
-  
+  configureWebpack: {
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env': {
+          PACKAGE_JSON: '"' + escape(JSON.stringify(require('./package.json'))) + '"'
+        }
+      })
+    ]
+  },
 };
