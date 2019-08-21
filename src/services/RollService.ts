@@ -81,6 +81,7 @@ export async function loadRolls() {
         console.log('Download is under progress');
       } else if (request.readyState == 4) {
         if (request.status != 200) {
+          errorObservable.emit('Failed to download data, please reload');
           return;
         }
         console.log('Downloading has finished');
