@@ -7,6 +7,17 @@
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title>Infinity Quick Dice</title>
   </head>
+  <!-- uncomment bellow to force service worker unergister -->
+<!--  <script type="application/javascript">
+    if(window.navigator && navigator.serviceWorker) {
+      navigator.serviceWorker.getRegistrations()
+              .then(function(registrations) {
+                for(let registration of registrations) {
+                  registration.unregister();
+                }
+              });
+    }
+  </script>-->
   <body>
     <noscript>
       <strong>We're sorry but Infinity Quick Dice doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>

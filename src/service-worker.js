@@ -3,12 +3,12 @@
  * requests for URLs in the manifest.
  * See https://goo.gl/S9QRab
  */
+importScripts('./version.js'); // written by DumpVueEnvVarsWebpackPlugin
+console.debug(`Using version = ${iqdVersion}`);
 
 workbox.core.setCacheNameDetails({prefix: 'iqd'});
 
-// todo handle this automatically with travis, from package.json
-console.log('toto' + JSON.parse(unescape(process.env.PACKAGE_JSON || '%7Bversion%3A0%7D')).version);
-const LATEST_VERSION = '0.1.00'; // Change this value every time you want to deploy
+const LATEST_VERSION = iqdVersion;
 
 self.addEventListener('activate', (event) => {
   console.log(`%c ${LATEST_VERSION} `, 'background: #ddd; color: #0000ff');
