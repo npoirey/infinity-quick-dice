@@ -4,7 +4,7 @@ Infinity quick dice is a Progressive Web App aiming to allow Infinity the game p
 
 This app is powered by Vuejs
 
-Special thanks to [![Browserstack](extra/Browserstack-logo-100.png)](https://www.browserstack.com), that allow me to have a free open souyrce account to be able to test this app on multiple browsers and systems !
+Special thanks to [![Browserstack](extra/Browserstack-logo-100.png)](https://www.browserstack.com), that allow me to have a free open source account to be able to test this app on multiple browsers and systems !
 
 ## How to contribute ?
 ### Project setup
