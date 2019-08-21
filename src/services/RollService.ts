@@ -43,8 +43,7 @@ export async function loadRolls() {
 
   let count = await db.count(storeName);
   console.log('currently ' + count + ' entries in indexedDb');
-  // fixme remove ||true
-  let loadData = count != expectedRollsNumber || true; //number of rolls we should have
+  let loadData = count != expectedRollsNumber; //number of rolls we should have
   if (loadData) {
     console.log('loading rolls');
     loadingStateObservable.emit({
