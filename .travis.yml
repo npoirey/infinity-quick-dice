@@ -25,4 +25,3 @@ jobs:
         target_branch: master
         on:
           tags: true
-          condition: $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+ # deploy only tags like vX.Y.Z
