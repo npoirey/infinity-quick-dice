@@ -8,6 +8,7 @@
     "build": "vue-cli-service build",
     "ui": "vue ui",
     "lint": "vue-cli-service lint",
+    "test": "echo faking test",
     "test:unit": "vue-cli-service test:unit"
   },
   "browserslist": [

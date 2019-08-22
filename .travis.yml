@@ -4,16 +4,24 @@ node_js:
 
 cache: npm
 
-script:
-  - npm run build
-
-deploy:
-  provider: pages
-  skip_cleanup: true
-  github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
-  keep_history: true
-  local_dir: dist # folder to upload
-  repo: npoirey/npoirey.github.io
-  target_branch: master
-  on:
-    branch: master
+jobs:
+  include:
+    - stage: testandbuild
+      name: "Build"
+      script: npm run build
+    - stage: testandbuild
+      name: "unit-tests"
+      script: npm run test
+    - stage: deploy
+      name: "Deploy on github"
+      script: skip
+      deploy:
+        provider: pages
+        skip_cleanup: true
+        github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+        keep_history: true
+        local_dir: dist # folder to upload
+        repo: npoirey/npoirey.github.io
+        target_branch: master
+        on:
+          branch: master
