@@ -24,4 +24,4 @@ jobs:
         repo: npoirey/npoirey.github.io
         target_branch: master
         on:
-          condition: tag =~ /v[0-9]*\.[0-9]*\.[0-9]*/ # deploy only tags like X.Y.Z
+          condition: $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+ # deploy only tags like vX.Y.Z
