@@ -1,5 +1,7 @@
 # infinity-quick-dice
 
+[![Build Status](https://travis-ci.com/npoirey/infinity-quick-dice.svg?branch=master)](https://travis-ci.com/npoirey/infinity-quick-dice)
+
 Infinity quick dice is a Progressive Web App aiming to allow Infinity the game player to quickly check for probabilities of their opposition rolls.
 
 This app is powered by Vuejs

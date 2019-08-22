@@ -8,6 +8,9 @@
     "build": "vue-cli-service build",
     "ui": "vue ui",
     "lint": "vue-cli-service lint",
+    "tag:deploy:major": "npm version major",
+    "tag:deploy:minor": "npm version minor",
+    "tag:deploy:patch": "npm version patch",
     "test": "echo faking test",
     "test:unit": "vue-cli-service test:unit"
   },
