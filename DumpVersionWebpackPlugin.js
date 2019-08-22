@@ -14,7 +14,7 @@ module.exports = class DumpVersionWebpackPlugin {
   }
   
   apply(compiler) {
-    const fileContent = `const iqdVersion = '${require('./package.json').version}'`;
+    const fileContent = `const VUE_APP_VERSION = '${require('./package.json').version}'`;
     const outputDir = compiler.options.output.path;
     if (!fs.existsSync(outputDir)) {
       // ideally we'd let Webpack create it for us, but not sure how to

@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const DumpVersionWebpackPlugin = require('./DumpVersionWebpackPlugin.js')
-const packageJson = require('./package.json');
+
+process.env.VUE_APP_VERSION = require('./package.json').version;
 
 module.exports = {
   lintOnSave: false,
@@ -22,11 +23,9 @@ module.exports = {
   configureWebpack: {
     plugins: [
       // define env vars to use to show version in app
-      new webpack.DefinePlugin({
-        'process.env': {
-          VUE_APP_VERSION: packageJson.version,
-        }
-      }),
+      /*new webpack.DefinePlugin({
+        'IQD_VERSION': JSON.stringify(packageJson.version),
+      }),*/
       // dump the env vars in a file importable by our service worker (again to get version from package.json)
       new DumpVersionWebpackPlugin({ filename: 'version.js' })
     ]
