@@ -1,10 +1,17 @@
 <template>
     <div class="player-conf-panel">
-        <h2>Player {{playerName}} Burst</h2>
+        <h2>
+            <font-awesome-icon icon="dice-d20" />
+            Player {{playerName}} Burst
+        </h2>
         <select-hex-button class="grid-6" :options="diceOptions" :value="value.burst" @input="updateBurst"></select-hex-button>
-        <h2>Player {{playerName}} rolls on</h2>
+        <h2>
+            <font-awesome-icon icon="crosshairs"/>
+            Player {{playerName}} rolls on
+        </h2>
         <select-hex-button class="grid-30" :options="attributesOptions" :value="value.attribute" @input="updateAttribute"></select-hex-button>
     </div>
+
 </template>
 
 <script lang="ts">
@@ -32,7 +39,7 @@
         ...this.value,
         burst: value,
       });
-      if(wasInvalid && !isInvalid){
+      if (wasInvalid && !isInvalid) {
         this.$emit('becomeValid');
       }
     }
@@ -44,7 +51,7 @@
         ...this.value,
         attribute: value,
       });
-      if(wasInvalid && !isInvalid){
+      if (wasInvalid && !isInvalid) {
         this.$emit('becomeValid');
       }
     }

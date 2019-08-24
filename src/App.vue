@@ -252,7 +252,6 @@
 
         .results {
             .roll-result {
-                display: block;
                 transition: all 0.5s;
                 max-height: 6em;
                 transform: scale(1);

@@ -1,6 +1,9 @@
 <template>
     <div class="roll-result">
-        <h5>{{input.playerA.burst}} dice at {{input.playerA.attribute}} VS {{input.playerB.burst}} dice at {{input.playerB.attribute}}</h5>
+        <div class="playerA player-conf">
+            <player-conf-value icon="dice-d20" :value="input.playerA.burst"></player-conf-value>
+            <player-conf-value icon="crosshairs" :value="input.playerA.attribute"></player-conf-value>
+        </div>
         <div class="ftf-grid"
              :style="{'grid-template-columns': `${percentData.playerACrit}% ${percentData.playerAHit}% auto ${percentData.playerBHit}% ${percentData.playerBCrit}%`}">
             <div class="ftf-grid-legend ftf-grid-legend-top">
@@ -21,15 +24,22 @@
                 <span class="player-b">Player B Crit ({{percentData.playerBCrit.toFixed(2)}}%)</span>
             </tr>
         </div>
+        <div class="playerB player-conf">
+            <player-conf-value icon="dice-d20" :value="input.playerB.burst" :reverse="true"></player-conf-value>
+            <player-conf-value icon="crosshairs" :value="input.playerB.attribute" :reverse="true"></player-conf-value>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
+  import PlayerConfValue from '@/components/PlayerConfValue.vue';
   import RollResultInput from '@/definitions/RollResultInput';
   import {getRollResult} from '@/services/RollService';
   import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 
-  @Component
+  @Component({
+    components: {PlayerConfValue},
+  })
   export default class HexButton extends Vue {
     @Prop({default: null}) private input!: RollResultInput;
     data: any = null;
@@ -117,11 +127,17 @@
     .roll-result {
         padding: 0.5em;
         background: $panel-neutral-background-color;
-        h5{
+        display: flex;
+        flex-flow: row;
+        .player-conf {
             font-family: Montalban;
-            margin: 0;
+            display: flex;
+            flex-flow: column;
+            justify-content: center;
         }
         .ftf-grid {
+            flex-grow: 1;
+            margin: 0 0.5em;
             $legend-bar-size: 8px;
             display: grid;
             grid-template-rows: auto $legend-bar-size 1em $legend-bar-size auto;
