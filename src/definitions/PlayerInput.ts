@@ -1,5 +1,7 @@
+import PlayerDmgInput from '@/definitions/PlayerDmgInput';
+import PlayerHitInput from '@/definitions/PlayerHitInput';
 
 export default interface PlayerInput {
-  burst?: number;
-  attribute?: number;
+  dmgConf?: PlayerDmgInput;
+  hitConf?: PlayerHitInput;
 }

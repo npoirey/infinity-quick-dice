@@ -15,9 +15,11 @@
             </transition>
         </div>
         <div class="main" id="main">
-            <player-conf-panel :player-name="'A'" id="player-conf-panel-a" class="player-conf-panel-a" v-model="playerA"
-                               @becomeValid="scrollMainPanel(1)"></player-conf-panel>
-            <player-conf-panel :player-name="'B'" id="player-conf-panel-b" class="player-conf-panel-b" v-model="playerB"></player-conf-panel>
+            <player-hit-conf-panel :player-name="'A'" id="player-hit-conf-panel-a" class="player-conf-panel-a" v-model="playerA.hitConf"
+                               @becomeValid="scrollMainPanel(1)"></player-hit-conf-panel>
+            <player-hit-conf-panel :player-name="'B'" id="player-hit-conf-panel-b" class="player-conf-panel-b" v-model="playerB.hitConf"></player-hit-conf-panel>
+            <player-dmg-conf-panel :player-name="'A'" id="player-dmg-conf-panel-a" class="player-conf-panel-a" v-model="playerA.dmgConf"></player-dmg-conf-panel>
+            <player-dmg-conf-panel :player-name="'B'" id="player-dmg-conf-panel-b" class="player-conf-panel-b" v-model="playerB.dmgConf"></player-dmg-conf-panel>
         </div>
         <div class="actions">
             <action-button @click="clear()" :label="'clear all results'"></action-button>
@@ -38,7 +40,8 @@
 <script lang="ts">
   import ActionButton from '@/components/ActionButton.vue';
   import HexButton from '@/components/HexButton.vue';
-  import PlayerConfPanel from '@/components/PlayerConfPanel.vue';
+  import PlayerDmgConfPanel from '@/components/PlayerDmgConfPanel.vue';
+  import PlayerHitConfPanel from '@/components/PlayerHitConfPanel.vue';
   import RollResult from '@/components/RollResult.vue';
   import SelectHexButton from '@/components/SelectHexButton.vue';
   import PlayerInput from '@/definitions/PlayerInput';
@@ -48,17 +51,18 @@
 
   @Component({
     components: {
+      PlayerDmgConfPanel,
       ActionButton,
       RollResult,
-      PlayerConfPanel,
+      PlayerHitConfPanel,
       SelectHexButton,
       HexButton,
     },
   })
   export default class App extends Vue {
     results: RollResultInput[] = [];
-    playerA: PlayerInput = {};
-    playerB: PlayerInput = {};
+    playerA: PlayerInput = {dmgConf: {}, hitConf: {}};
+    playerB: PlayerInput = {dmgConf: {}, hitConf: {}};
     loadingState: LoadingState = {
       state: 'done',
       download: 0,
@@ -89,7 +93,8 @@
           type: 'error',
         });
         canProceed = false;
-      } else if (!this.playerA || !this.playerA.burst || !this.playerA.attribute || !this.playerB || !this.playerB.burst || !this.playerB.attribute) {
+      } else if (!this.playerA || !this.playerA.hitConf || !this.playerA.hitConf.burst || !this.playerA.hitConf.attribute
+                 || !this.playerB || !this.playerB.hitConf || !this.playerB.hitConf.burst || !this.playerB.hitConf.attribute) {
         Vue.toasted.show('at least burst and roll are needed for both players', {
           type: 'error',
         });
@@ -203,7 +208,9 @@
                 overflow-y: visible;
                 grid-template-columns: 100% 100%;
                 grid-template-rows: 1fr;
+                //noinspection CssInvalidFunction,CssUnknownProperty
                 scroll-snap-coordinate: 0 0;
+                //noinspection CssInvalidFunction,CssUnknownProperty
                 scroll-snap-points-x: repeat(100%);
                 scroll-snap-type: x mandatory;
                 -webkit-overflow-scrolling: touch;
@@ -212,6 +219,12 @@
                 // PC
                 grid-template-columns: 1fr 1fr;
                 grid-template-rows: 1fr;
+                .player-hit-conf-panel{
+                    padding-bottom: 0;
+                }
+                .player-dmg-conf-panel {
+                    padding-top: 0;
+                }
             }
 
 

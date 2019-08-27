@@ -1,8 +1,10 @@
 <template>
     <div class="roll-result">
         <div class="playerA player-conf">
-            <player-conf-value icon="dice-d20" :value="input.playerA.burst"></player-conf-value>
-            <player-conf-value icon="crosshairs" :value="input.playerA.attribute"></player-conf-value>
+            <player-conf-value icon="dice-d20" :value="input.playerA.hitConf.burst"></player-conf-value>
+            <player-conf-value icon="crosshairs" :value="input.playerA.hitConf.attribute"></player-conf-value>
+            <player-conf-value v-if="input.playerA.dmgConf.armor" icon="shield" :value="input.playerA.dmgConf.armor"></player-conf-value>
+            <player-conf-value v-if="input.playerA.dmgConf.damage" icon="sword" :value="input.playerA.dmgConf.damage"></player-conf-value>
         </div>
         <div class="ftf-grid"
              :style="{'grid-template-columns': `${percentData.playerACrit}% ${percentData.playerAHit}% auto ${percentData.playerBHit}% ${percentData.playerBCrit}%`}">
@@ -25,9 +27,14 @@
             </tr>
         </div>
         <div class="playerB player-conf">
-            <player-conf-value icon="dice-d20" :value="input.playerB.burst" :reverse="true"></player-conf-value>
-            <player-conf-value icon="crosshairs" :value="input.playerB.attribute" :reverse="true"></player-conf-value>
+            <player-conf-value icon="dice-d20" :value="input.playerB.hitConf.burst" :reverse="true"></player-conf-value>
+            <player-conf-value icon="crosshairs" :value="input.playerB.hitConf.attribute" :reverse="true"></player-conf-value>
+            <player-conf-value v-if="input.playerB.dmgConf.armor" icon="shield" :value="input.playerB.dmgConf.armor"
+                               :reverse="true"></player-conf-value>
+            <player-conf-value v-if="input.playerB.dmgConf.damage" icon="sword" :value="input.playerB.dmgConf.damage"
+                               :reverse="true"></player-conf-value>
         </div>
+        {{dmgResults}}
     </div>
 </template>
 
@@ -37,28 +44,34 @@
   import {getRollResult} from '@/services/RollService';
   import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 
+  interface HittingData {
+    crits: number,
+    hits: number,
+  }
+
   @Component({
     components: {PlayerConfValue},
   })
   export default class HexButton extends Vue {
     @Prop({default: null}) private input!: RollResultInput;
     data: any = null;
-    percentData: any =  {
+    percentData: any = {
       playerACrit: 0,
       playerAHit: 0,
       nothing: 0,
       playerBCrit: 0,
       playerBHit: 0,
     };
+    dmgResults: any = {};
     total: number = 0;
 
     @Watch('input', {immediate: true, deep: true})
     async onInputChange(newVal: RollResultInput) {
-      if (newVal && newVal.playerA && newVal.playerB && newVal.playerA.burst && newVal.playerB.burst) {
-        const invert = newVal.playerA.burst > newVal.playerB.burst;
+      if (newVal && newVal.playerA && newVal.playerB && newVal.playerA.hitConf && newVal.playerB.hitConf && newVal.playerA.hitConf.burst && newVal.playerB.hitConf.burst) {
+        const invert = newVal.playerA.hitConf.burst > newVal.playerB.hitConf.burst;
         const key = invert ?
-                    newVal.playerB.burst + 'dicesat' + newVal.playerB.attribute + 'vs' + newVal.playerA.burst + 'dicesat' + newVal.playerA.attribute :
-                    newVal.playerA.burst + 'dicesat' + newVal.playerA.attribute + 'vs' + newVal.playerB.burst + 'dicesat' + newVal.playerB.attribute;
+                    newVal.playerB.hitConf.burst + 'dicesat' + newVal.playerB.hitConf.attribute + 'vs' + newVal.playerA.hitConf.burst + 'dicesat' + newVal.playerA.hitConf.attribute :
+                    newVal.playerA.hitConf.burst + 'dicesat' + newVal.playerA.hitConf.attribute + 'vs' + newVal.playerB.hitConf.burst + 'dicesat' + newVal.playerB.hitConf.attribute;
         console.log('loading data from' + key + ', invert=' + invert);
         const results = await getRollResult(key);
         this.loadData(results, invert);
@@ -66,58 +79,105 @@
     }
 
     loadData(rawData: { [s: string]: number }, invert: boolean) {
-      console.log(rawData);
-      let ftFResult = {
+      let ftFResult: { [key: string]: number } = {
         playerACrit: 0,
         playerAHit: 0,
         nothing: 0,
         playerBCrit: 0,
         playerBHit: 0,
       };
-      this.total = 0;
+      let percentData = {...ftFResult};
+      let woundsToCompute = 2;
+      let dmgResults: any = {
+        playerAWin: {},
+        nothing: 0,
+        playerBWin: {},
+      };
+      this.total = Object.keys(rawData).reduce((acc, currentKey) => acc + rawData[currentKey], 0);
       for (let key of Object.keys(rawData)) {
         let strings = key.replace(/c/g, '').split('v');
         let firstStringSplitted = strings[0].split('h');
         let secondStringSplitted = strings[1].split('h');
-        let firstPlayerCritNumber = parseInt(firstStringSplitted[0]);
-        let firstPlayerHitNumber = parseInt(firstStringSplitted[1]);
-        let secondPlayerCritNumber = parseInt(secondStringSplitted[0]);
-        let secondPlayerHitNumber = parseInt(secondStringSplitted[1]);
-        if (invert) {
-          if (firstPlayerCritNumber > 0) {
-            ftFResult.playerBCrit += rawData[key];
-          } else if (firstPlayerHitNumber > 0) {
-            ftFResult.playerBHit += rawData[key];
-          } else if (secondPlayerCritNumber > 0) {
-            ftFResult.playerACrit += rawData[key];
-          } else if (secondPlayerHitNumber > 0) {
-            ftFResult.playerAHit += rawData[key];
-          } else {
-            ftFResult.nothing += rawData[key];
+        let throwResult = {
+          firstPlayer: {
+            crits: parseInt(firstStringSplitted[0]),
+            hits: parseInt(firstStringSplitted[1]),
+          },
+          secondPlayer: {
+            crits: parseInt(secondStringSplitted[0]),
+            hits: parseInt(secondStringSplitted[1]),
+          },
+        };
+        let firstPlayer = invert ? 'B' : 'A';
+        let secondPlayer = invert ? 'A' : 'B';
+        let hittingPlayer: string | null;
+        let hittingData: HittingData | null;
+        let scenarioProbability = (rawData[key] / this.total * 100);
+        // computing ftf
+        if (throwResult.firstPlayer.crits > 0) {
+          ftFResult[`player${firstPlayer}Crit`] += rawData[key];
+          percentData[`player${firstPlayer}Crit`] += scenarioProbability;
+          hittingPlayer = firstPlayer;
+          hittingData = throwResult.firstPlayer;
+        } else if (throwResult.firstPlayer.hits > 0) {
+          ftFResult[`player${firstPlayer}Hit`] += rawData[key];
+          percentData[`player${firstPlayer}Hit`] += scenarioProbability;
+          hittingPlayer = firstPlayer;
+          hittingData = throwResult.firstPlayer;
+        } else if (throwResult.secondPlayer.crits > 0) {
+          ftFResult[`player${secondPlayer}Crit`] += rawData[key];
+          percentData[`player${secondPlayer}Crit`] += scenarioProbability;
+          hittingPlayer = secondPlayer;
+          hittingData = throwResult.secondPlayer;
+        } else if (throwResult.secondPlayer.hits > 0) {
+          ftFResult[`player${secondPlayer}Hit`] += rawData[key];
+          percentData[`player${secondPlayer}Hit`] += scenarioProbability;
+          hittingPlayer = secondPlayer;
+          hittingData = throwResult.secondPlayer;
+        } else {
+          ftFResult['nothing'] += rawData[key];
+          percentData[`nothing`] += scenarioProbability;
+          hittingPlayer = null;
+          hittingData = null;
+        }
+        // computing wounds
+        if (hittingData) {
+          let nbWoundsFromCrits = hittingData.crits;
+          let nbSaveRolls = hittingData.hits;
+          let subProbasOfWounds: {[key: string]: number} = {};
+          for (let i = 0; i < woundsToCompute; i++) {
+            // compute probability of exactly i wounds inflicted for the current scenario
+            if (nbWoundsFromCrits > i) {
+              subProbasOfWounds[`${i}`] = 0;
+            } else {
+              // todo 'proba de (i-nbWoundsFromCrits) jets de sauvegarde ratés'
+              subProbasOfWounds[`${i}`] = (1 - 0.2) / woundsToCompute;
+            }
+          }
+          // compute the rest (woundsToCompute or more wounds inflicted)
+          subProbasOfWounds[`${woundsToCompute}OrMore`] = 1 - Object.keys(subProbasOfWounds).reduce((acc, key) => acc + subProbasOfWounds[key], 0);
+
+          // from this sub probabilities, augment the aggregated values
+          console.log(subProbasOfWounds);
+          console.log(Object.keys(subProbasOfWounds));
+          for(let key of Object.keys(subProbasOfWounds)){
+
+            if(key === '0') {
+              dmgResults.nothing += scenarioProbability * subProbasOfWounds[0];
+            } else {
+              if(!dmgResults[`player${hittingPlayer}Win`][key]){
+                dmgResults[`player${hittingPlayer}Win`][key] = 0;
+              }
+              dmgResults[`player${hittingPlayer}Win`][key] += scenarioProbability * subProbasOfWounds[key];
+            }
           }
         } else {
-          if (firstPlayerCritNumber > 0) {
-            ftFResult.playerACrit += rawData[key];
-          } else if (firstPlayerHitNumber > 0) {
-            ftFResult.playerAHit += rawData[key];
-          } else if (secondPlayerCritNumber > 0) {
-            ftFResult.playerBCrit += rawData[key];
-          } else if (secondPlayerHitNumber > 0) {
-            ftFResult.playerBHit += rawData[key];
-          } else {
-            ftFResult.nothing += rawData[key];
-          }
+          dmgResults.nothing += scenarioProbability;
         }
-        this.total += rawData[key];
       }
       this.data = ftFResult;
-      this.percentData = {
-        playerACrit: parseFloat((ftFResult.playerACrit / this.total * 100).toFixed(2)),
-        playerAHit: parseFloat((ftFResult.playerAHit / this.total * 100).toFixed(2)),
-        nothing: parseFloat((ftFResult.nothing / this.total * 100).toFixed(2)),
-        playerBCrit: parseFloat((ftFResult.playerBCrit / this.total * 100).toFixed(2)),
-        playerBHit: parseFloat((ftFResult.playerBHit / this.total * 100).toFixed(2)),
-      };
+      this.percentData = percentData;
+      this.dmgResults = dmgResults;
     }
   }
 </script>
@@ -129,12 +189,14 @@
         background: $panel-neutral-background-color;
         display: flex;
         flex-flow: row;
+
         .player-conf {
             font-family: Montalban;
             display: flex;
             flex-flow: column;
             justify-content: center;
         }
+
         .ftf-grid {
             flex-grow: 1;
             margin: 0 0.5em;
@@ -192,6 +254,7 @@
             .ftf-grid-legend-bar {
                 border: 1px solid white;
                 margin: 2px 0;
+
                 &.ftf-grid-legend-bar-top {
                     border-bottom: none;
 
@@ -206,6 +269,7 @@
 
                 &.ftf-grid-legend-bar-bottom {
                     border-top: none;
+
                     &.ftf-grid-legend-bar-player-a {
                         grid-area: legend-bar-bottom-a;
                     }
